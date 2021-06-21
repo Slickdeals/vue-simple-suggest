@@ -266,11 +266,12 @@ require('vue-simple-suggest/lib/polyfills');
 
 ### Usage
 
-**Globaly:**
+**Globally:**
 
 ```js
-// You don't need to do it, if including via <script> (umd, iife)
-Vue.component('vue-simple-suggest', VueSimpleSuggest)
+const app = createApp(MyApp)
+
+app.component('vue-simple-suggest', VueSimpleSuggest)
 ```
 
 **In single-file .vue components:**

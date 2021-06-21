@@ -1,3 +1,5 @@
+import { openBlock, createBlock, withKeys, createVNode, renderSlot, mergeProps, Transition, withCtx, createCommentVNode, Fragment, renderList, toDisplayString } from 'vue';
+
 const defaultControls = {
   selectionUp: [38],
   selectionDown: [40],
@@ -31,28 +33,7 @@ function hasKeyCodeByCode(arr, keyCode) {
   }
 }
 
-var VueSimpleSuggest = {
-  render: function () {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "vue-simple-suggest", class: [_vm.styles.vueSimpleSuggest, { designed: !_vm.destyled, focus: _vm.isInFocus }], on: { "keydown": function ($event) {
-          if (!$event.type.indexOf('key') && _vm._k($event.keyCode, "tab", 9, $event.key, "Tab")) {
-            return null;
-          }_vm.isTabbed = true;
-        } } }, [_c('div', { ref: "inputSlot", staticClass: "input-wrapper", class: _vm.styles.inputWrapper, attrs: { "role": "combobox", "aria-haspopup": "listbox", "aria-owns": _vm.listId, "aria-expanded": !!_vm.listShown && !_vm.removeList ? 'true' : 'false' } }, [_vm._t("default", [_c('input', _vm._b({ staticClass: "default-input", class: _vm.styles.defaultInput, domProps: { "value": _vm.text || '' } }, 'input', _vm.$attrs, false))])], 2), _vm._v(" "), _c('transition', { attrs: { "name": "vue-simple-suggest" } }, [!!_vm.listShown && !_vm.removeList ? _c('ul', { staticClass: "suggestions", class: _vm.styles.suggestions, attrs: { "id": _vm.listId, "role": "listbox", "aria-labelledby": _vm.listId } }, [!!this.$scopedSlots['misc-item-above'] ? _c('li', [_vm._t("misc-item-above", null, { "suggestions": _vm.suggestions, "query": _vm.text })], 2) : _vm._e(), _vm._v(" "), _vm._l(_vm.suggestions, function (suggestion, index) {
-      return _c('li', { key: _vm.getId(suggestion, index), staticClass: "suggest-item", class: [_vm.styles.suggestItem, {
-          selected: _vm.isSelected(suggestion),
-          hover: _vm.isHovered(suggestion)
-        }], attrs: { "role": "option", "aria-selected": _vm.isHovered(suggestion) || _vm.isSelected(suggestion) ? 'true' : 'false', "id": _vm.getId(suggestion, index) }, on: { "mouseenter": function ($event) {
-            return _vm.hover(suggestion, $event.target);
-          }, "mouseleave": function ($event) {
-            return _vm.hover(undefined);
-          }, "click": function ($event) {
-            return _vm.suggestionClick(suggestion, $event);
-          } } }, [_vm._t("suggestion-item", [_c('span', [_vm._v(_vm._s(_vm.displayProperty(suggestion)))])], { "autocomplete": function () {
-          return _vm.autocompleteText(suggestion);
-        }, "suggestion": suggestion, "query": _vm.text })], 2);
-    }), _vm._v(" "), !!this.$scopedSlots['misc-item-below'] ? _c('li', [_vm._t("misc-item-below", null, { "suggestions": _vm.suggestions, "query": _vm.text })], 2) : _vm._e()], 2) : _vm._e()])], 1);
-  },
-  staticRenderFns: [],
+var script = {
   name: 'vue-simple-suggest',
   inheritAttrs: false,
   model: {
@@ -129,10 +110,7 @@ var VueSimpleSuggest = {
   watch: {
     mode: {
       handler(current, old) {
-        this.constructor.options.model.event = current;
-
-        // Can be null if the component is root
-        this.$parent && this.$parent.$forceUpdate();
+        this.$options.model.event = current;
 
         this.$nextTick(() => {
           if (current === 'input') {
@@ -154,7 +132,7 @@ var VueSimpleSuggest = {
       immediate: true
     }
   },
-  //
+
   data() {
     return {
       selected: null,
@@ -174,6 +152,7 @@ var VueSimpleSuggest = {
       listId: `${this._uid}-suggestions`
     };
   },
+  emits: ['input', 'select', 'hover', 'hide-list', 'show-list', 'suggestion-click', 'blur', 'focus', 'request-start', 'request-done', 'request-failed'],
   computed: {
     listIsRequest() {
       return typeof this.list === 'function';
@@ -221,7 +200,7 @@ var VueSimpleSuggest = {
       console.error('No input element found');
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.prepareEventHandlers(false);
   },
   methods: {
@@ -271,7 +250,7 @@ var VueSimpleSuggest = {
       return true;
     },
     miscSlotsAreEmpty() {
-      const slots = ['misc-item-above', 'misc-item-below'].map(s => this.$scopedSlots[s]);
+      const slots = ['misc-item-above', 'misc-item-below'].map(s => this.$slots[s]);
 
       if (slots.every(s => !!s)) {
         return slots.every(this.isScopedSlotEmpty.bind(this));
@@ -526,7 +505,7 @@ var VueSimpleSuggest = {
           let newList = await this.getSuggestions(this.text);
 
           if (textBeforeRequest === this.text) {
-            this.$set(this, 'suggestions', newList);
+            this.suggestions = newList;
           }
         }
       } catch (e) {
@@ -605,4 +584,60 @@ var VueSimpleSuggest = {
   }
 };
 
-export default VueSimpleSuggest;
+const _hoisted_1 = { key: 0 };
+const _hoisted_2 = { key: 1 };
+
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  return openBlock(), createBlock("div", {
+    class: ["vue-simple-suggest", [$props.styles.vueSimpleSuggest, { designed: !$props.destyled, focus: $data.isInFocus }]],
+    onKeydown: _cache[2] || (_cache[2] = withKeys($event => $data.isTabbed = true, ["tab"]))
+  }, [createVNode("div", {
+    class: ["input-wrapper", $props.styles.inputWrapper],
+    ref: "inputSlot",
+    role: "combobox",
+    "aria-haspopup": "listbox",
+    "aria-owns": $data.listId,
+    "aria-expanded": !!$data.listShown && !$props.removeList ? 'true' : 'false'
+  }, [renderSlot(_ctx.$slots, "default", {}, () => [createVNode("input", mergeProps({ class: "default-input" }, _ctx.$attrs, {
+    value: $data.text || '',
+    class: $props.styles.defaultInput
+  }), null, 16 /* FULL_PROPS */, ["value"])])], 10 /* CLASS, PROPS */, ["aria-owns", "aria-expanded"]), createVNode(Transition, { name: "vue-simple-suggest" }, {
+    default: withCtx(() => [!!$data.listShown && !$props.removeList ? (openBlock(), createBlock("ul", {
+      key: 0,
+      id: $data.listId,
+      class: ["suggestions", $props.styles.suggestions],
+      role: "listbox",
+      "aria-labelledby": $data.listId
+    }, [!!this.$slots['misc-item-above'] ? (openBlock(), createBlock("li", _hoisted_1, [renderSlot(_ctx.$slots, "misc-item-above", {
+      suggestions: $data.suggestions,
+      query: $data.text
+    })])) : createCommentVNode("v-if", true), (openBlock(true), createBlock(Fragment, null, renderList($data.suggestions, (suggestion, index) => {
+      return openBlock(), createBlock("li", {
+        class: ["suggest-item", [$props.styles.suggestItem, {
+          selected: $options.isSelected(suggestion),
+          hover: $options.isHovered(suggestion)
+        }]],
+        role: "option",
+        onMouseenter: $event => $options.hover(suggestion, $event.target),
+        onMouseleave: _cache[1] || (_cache[1] = $event => $options.hover(undefined)),
+        onClick: $event => $options.suggestionClick(suggestion, $event),
+        "aria-selected": $options.isHovered(suggestion) || $options.isSelected(suggestion) ? 'true' : 'false',
+        id: $options.getId(suggestion, index),
+        key: $options.getId(suggestion, index)
+      }, [renderSlot(_ctx.$slots, "suggestion-item", {
+        autocomplete: () => $options.autocompleteText(suggestion),
+        suggestion: suggestion,
+        query: $data.text
+      }, () => [createVNode("span", null, toDisplayString($options.displayProperty(suggestion)), 1 /* TEXT */)])], 42 /* CLASS, PROPS, HYDRATE_EVENTS */, ["onMouseenter", "onClick", "aria-selected", "id"]);
+    }), 128 /* KEYED_FRAGMENT */)), !!this.$slots['misc-item-below'] ? (openBlock(), createBlock("li", _hoisted_2, [renderSlot(_ctx.$slots, "misc-item-below", {
+      suggestions: $data.suggestions,
+      query: $data.text
+    })])) : createCommentVNode("v-if", true)], 10 /* CLASS, PROPS */, ["id", "aria-labelledby"])) : createCommentVNode("v-if", true)]),
+    _: 3 /* FORWARDED */
+  })], 34 /* CLASS, HYDRATE_EVENTS */);
+}
+
+script.render = render;
+script.__file = "lib/vue-simple-suggest.vue";
+
+export default script;

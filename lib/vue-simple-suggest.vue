@@ -20,7 +20,7 @@
         :aria-labelledby="listId"
         :class="styles.suggestions"
       >
-        <li v-if="!!this.$scopedSlots['misc-item-above']">
+        <li v-if="!!this.$slots['misc-item-above']">
           <slot name="misc-item-above"
             :suggestions="suggestions"
             :query="text"
@@ -48,7 +48,7 @@
           </slot>
         </li>
 
-        <li v-if="!!this.$scopedSlots['misc-item-below']">
+        <li v-if="!!this.$slots['misc-item-below']">
           <slot name="misc-item-below"
             :suggestions="suggestions"
             :query="text"
@@ -145,10 +145,7 @@ export default {
   watch: {
     mode: {
       handler(current, old) {
-        this.constructor.options.model.event = current
-
-        // Can be null if the component is root
-        this.$parent && this.$parent.$forceUpdate()
+        this.$options.model.event = current
 
         this.$nextTick(() => {
           if (current === 'input') {
@@ -170,7 +167,7 @@ export default {
       immediate: true
     }
   },
-  //
+  
   data () {
     return {
       selected: null,
@@ -190,6 +187,7 @@ export default {
       listId: `${this._uid}-suggestions`
     }
   },
+  emits: ['input', 'select', 'hover', 'hide-list', 'show-list', 'suggestion-click', 'blur', 'focus', 'request-start', 'request-done', 'request-failed'],
   computed: {
     listIsRequest () {
       return typeof this.list === 'function'
@@ -237,7 +235,7 @@ export default {
       console.error('No input element found')
     }
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.prepareEventHandlers(false)
   },
   methods: {
@@ -287,7 +285,7 @@ export default {
       return true
     },
     miscSlotsAreEmpty () {
-      const slots = ['misc-item-above', 'misc-item-below'].map(s => this.$scopedSlots[s])
+      const slots = ['misc-item-above', 'misc-item-below'].map(s => this.$slots[s])
 
       if (slots.every(s => !!s)) {
         return slots.every(this.isScopedSlotEmpty.bind(this))
@@ -550,7 +548,7 @@ export default {
           let newList = await this.getSuggestions(this.text)
 
           if (textBeforeRequest === this.text) {
-            this.$set(this, 'suggestions', newList)
+            this.suggestions = newList;
           }
         }
       }
